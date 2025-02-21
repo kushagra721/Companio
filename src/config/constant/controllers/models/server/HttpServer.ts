@@ -46,7 +46,7 @@ export class HttpServer {
   // Route configuration
   private configureRoutes(): void {
     const externalController = new ExternalController();
-    this.app.use("/cms/external", externalController.router);
+    this.app.use("/companio/external", externalController.router);
     this.app.get("/cms/health", (req: Request, res: Response) => {
       res.status(200).json({
         status: "UP",
