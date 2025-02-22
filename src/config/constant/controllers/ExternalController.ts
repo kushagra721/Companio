@@ -89,7 +89,7 @@ export class ExternalController {
 
     private userSignUp = async (req: Request, res: Response): Promise<any>  => {
         try {
-            const { name, mobileNo, profilePic, type, fcmToken, deviceType, uid } = req.body;
+            const { name, mobileNo, profilePic, type, fcmToken, deviceType, id } = req.body;
     
             // Check if user already exists
             const existingUser = await SignupModel.findOne({ mobileNo });
@@ -98,7 +98,7 @@ export class ExternalController {
             }
     
             // Create new user
-            const newUser = new SignupModel({ name, mobileNo, profilePic, type, fcmToken, deviceType, uid });
+            const newUser = new SignupModel({ name, mobileNo, profilePic, type, fcmToken, deviceType, id });
             await newUser.save();
     
             res.status(200).json({ message: 'User signed up successfully', user: newUser });
