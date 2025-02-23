@@ -1,9 +1,9 @@
 import express, { Express, Request, Response } from "express";
 import http from "http";
-import path from 'path';
 import cors from 'cors';
-import connectToDatabase from "../../../../db";
-import { ExternalController } from "../../ExternalController";
+import connectToDatabase from "../config/db";
+import { ExternalController } from "../controllers/ExternalController";
+import { categoryRoutes } from "../routes/categoryRoutes";
 export class HttpServer {
   private app: Express;
   private port: number;
@@ -47,6 +47,7 @@ export class HttpServer {
   private configureRoutes(): void {
     const externalController = new ExternalController();
     this.app.use("/companio/external", externalController.router);
+    this.app.use("/api/categories", categoryRoutes);
     this.app.get("/cms/health", (req: Request, res: Response) => {
       res.status(200).json({
         status: "UP",

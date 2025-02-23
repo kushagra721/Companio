@@ -1,15 +1,5 @@
 import mongoose, { Schema, Document } from 'mongoose';
-
-export interface SignupEntity extends Document {
-    name: string;
-    mobileNo: string;
-    profilePic: string;
-    type: 'buyer' | 'seller';
-    fcmToken: string;
-    deviceType: string;
-    cDt: Date;
-    id: string;
-}
+import { SignupEntity } from '../entities/UserEntity';
 
 const SignupSchema: Schema = new Schema({
     name: { type: String, required: true },
