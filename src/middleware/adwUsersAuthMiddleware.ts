@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
-import { Log } from "../../helper/Logger";
+//import { Log } from "../../helper/Logger";
 import { Mongoose } from "mongoose";
-import { UserEntity } from "../../models/Entities/UserEntity";
+import { LoginEntity } from "../entities/LoginEntity";
 
 dotenv.config();
 
@@ -36,14 +36,14 @@ export const authenticateJWT = () => async(req: Request, res: Response, next: Ne
         (req as any).user = decoded;
 
         const uid = (req as any).user.uid;
-        const userDetails = await UserEntity.findOne({uid});
+        const userDetails = await LoginEntity.findOne({uid});
     
         // Check if token's issued time (iat) is older than the resetPasswordTimeStamp
-        if (userDetails && userDetails.resetPasswordTimeStamp && (req as any).user.iat * 1000 < userDetails.resetPasswordTimeStamp) {
-            return res.status(403).json({ message: "Your password has been updated. Please log in again." });
-        }
+        // if (userDetails && userDetails.resetPasswordTimeStamp && (req as any).user.iat * 1000 < userDetails.resetPasswordTimeStamp) {
+        //     return res.status(403).json({ message: "Your password has been updated. Please log in again." });
+        // }
 
-        Log.info("User authenticated:", decoded);
+     //   Log.info("User authenticated:", decoded);
         return next();
     }
     catch (error) {
