@@ -1,6 +1,6 @@
 import { Router, Request, Response, response, application } from 'express';
 import dotenv from 'dotenv';
-import { SignupModel } from '../models/UserModel';
+import { Counter, SignupModel } from '../models/UserModel';
 import { LoginEntity } from '../entities/LoginEntity';
 import { ApiResponseDto } from '../models/Dto/ApiResponseDto';
 import { ApiResponse, HttpStatus } from '../config/constant/constant';
@@ -27,6 +27,7 @@ export class ExternalController {
     }
 
     private verifyOtp = async (req: Request, res: Response): Promise<any> => {
+        console.log('incoming');
 
         const apiResponseDto = new ApiResponseDto();
 
@@ -65,7 +66,7 @@ export class ExternalController {
                 apiResponseDto.message = ApiResponse.OTP_NOT_VERIFIED;
                 apiResponseDto.responseCode = HttpStatus.NOT_FOUND;
             }
-            return apiResponseDto;
+            return res.json(apiResponseDto);
         } catch (error) {
             return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
                 status: ApiResponse.ERROR,
@@ -75,7 +76,9 @@ export class ExternalController {
     }
 
     private generateOtp = async (req: Request, res: Response) => {
+        console.log('coming');
         const mobile_number = req.body.mobile_number;
+      //  const type = req.body.type;
         if (!mobile_number || !/^\d{10}$/.test(mobile_number)) {
             res.status(400).json({ error: "Mobile number must be exactly 10 digits" });
             return;
@@ -113,14 +116,19 @@ export class ExternalController {
 
     private userSignUp = async (req: Request, res: Response): Promise<any>  => {
         try {
-            const { name, mobileNo, profilePic, type, fcmToken, deviceType, id } = req.body;
+            const { name, mobileNo, profilePic, type, fcmToken, deviceType} = req.body;
+
+            if(!name || !mobileNo || !type){
+                return res.status(400).json({ message: 'missing field'});
+            }
     
             // Check if user already exists
             const existingUser = await SignupModel.findOne({ mobileNo });
             if (existingUser) {
                 return res.status(400).json({ message: 'User already exists' });
             }
-    
+
+            const id = await this.generateUserId();
             // Create new user
             const newUser = new SignupModel({ name, mobileNo, profilePic, type, fcmToken, deviceType, id });
             await newUser.save();
@@ -130,8 +138,15 @@ export class ExternalController {
             res.status(500).json({ message: 'Internal Server Error', error });
         }
     };
-    
 
+    private async generateUserId(): Promise<any> {
+        const counter = await Counter.findOneAndUpdate(
+            { modelName: 'Signup' },
+            { $inc: { count: 1 } },
+            { new: true, upsert: true }
+        );
+        return counter?.count ?? 1;
+    }
 
 }
 
