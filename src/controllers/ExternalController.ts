@@ -132,6 +132,7 @@ export class ExternalController {
             res.status(500).json({ error: "Failed to send otp", status: "failed" });
         }
     };
+    
 
     private userSignUp = async (req: Request, res: Response): Promise<any>  => {
         try {
